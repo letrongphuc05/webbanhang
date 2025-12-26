@@ -1,31 +1,29 @@
 <?php
 session_start();
-include 'connect.php'; // Gọi file connect.php vừa tạo ở Bước 1
-
-$error = ''; 
+include 'connect.php';
 
 if (isset($_POST['btn_login'])) {
     $u = $_POST['username'];
     $p = $_POST['password'];
 
-    // Sử dụng Prepared Statement để bảo mật
-    $sql = "SELECT * FROM taikhoan WHERE username = ?";
-    $stmt = mysqli_prepare($connect, $sql);
+    // 1. Tìm user có quyền admin (role=1)
+    $sql = "SELECT * FROM taikhoan WHERE username = ? AND role = 1";
+    $stmt = mysqli_prepare($conn, $sql);
     mysqli_stmt_bind_param($stmt, "s", $u);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 
     if ($row = mysqli_fetch_assoc($result)) {
-        // Kiểm tra mật khẩu
+        // 2. Kiểm tra mật khẩu hash
         if (password_verify($p, $row['password'])) {
-            $_SESSION['user'] = $u; // Lưu session
-            header("Location: ../index/index.php"); // Chuyển hướng về trang chủ (lùi lại 1 cấp thư mục rồi vào index)
+            $_SESSION['admin_login'] = $u;
+            header("Location: admin_products.php");
             exit();
         } else {
             $error = "Mật khẩu không đúng!";
         }
     } else {
-        $error = "Tài khoản không tồn tại!";
+        $error = "Tài khoản không tồn tại hoặc không có quyền Admin!";
     }
 }
 ?>
@@ -33,7 +31,7 @@ if (isset($_POST['btn_login'])) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Đăng nhập Khách hàng</title>
+    <title>Đăng nhập Admin</title>
     <style>
         body { 
             font-family: Arial, sans-serif; 
@@ -41,17 +39,15 @@ if (isset($_POST['btn_login'])) {
             justify-content: center; 
             align-items: center; 
             height: 100vh; 
-            background-color: #FFFFFF; /* Nền trắng tinh */
-            margin: 0;
+            background-color: #e0e0e0; /* Nền xám nhẹ */
         }
         .login-box { 
             background: white; 
             padding: 40px; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15); 
+            border-radius: 20px; /* Bo góc lớn */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); /* Bóng đổ rõ nét */
             width: 350px; 
             text-align: center;
-            border: 1px solid #f0f0f0;
         }
         h2 { text-align: center; margin-bottom: 25px; color: #333; }
         input { 
@@ -65,7 +61,7 @@ if (isset($_POST['btn_login'])) {
         button { 
             width: 100%; 
             padding: 12px; 
-            background: #cd1818; /* Nút màu đỏ */
+            background: #cd1818; /* Nút đỏ */
             color: white; 
             border: none; 
             border-radius: 8px; 
@@ -75,26 +71,19 @@ if (isset($_POST['btn_login'])) {
             font-size: 16px;
         }
         button:hover { background: #a81313; }
-        .error { color: #cd1818; font-size: 14px; text-align: center; display: block; margin-bottom: 10px; }
-        .link { margin-top: 20px; font-size: 14px; }
-        .link a { color: #333; text-decoration: none; }
-        .link a:hover { color: #cd1818; text-decoration: underline; }
+        .error { color: #cd1818; font-size: 14px; text-align: center; }
+        .link { margin-top: 15px; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="login-box">
-        <h2>Đăng Nhập</h2>
-        <?php if(!empty($error)) echo "<span class='error'>$error</span>"; ?>
-        
+        <h2>Đăng nhập Admin</h2>
+        <?php if(isset($error)) echo "<p class='error'>$error</p>"; ?>
         <form method="post">
-            <input type="text" name="username" placeholder="Tên đăng nhập" required>
+            <input type="text" name="username" placeholder="Tài khoản Admin" required>
             <input type="password" name="password" placeholder="Mật khẩu" required>
             <button type="submit" name="btn_login">Đăng nhập</button>
         </form>
-        
-        <div class="link">
-            <a href="active_register.php">Chưa có tài khoản? Đăng ký ngay!</a>
-        </div>
     </div>
 </body>
 </html>
