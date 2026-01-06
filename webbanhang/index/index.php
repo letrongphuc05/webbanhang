@@ -184,7 +184,38 @@ function getPaginationQueryString($page, $category_id, $search, $brand_id) {
         <?php if ($currentPage < $totalPages): ?>
             <a href="<?php echo getPaginationQueryString($currentPage + 1, $category_id, $search, $brand_id); ?>">Sau &raquo;</a>
         <?php endif; ?>
+
+        <!-- Form nhập số trang -->
+        <form method="GET" action="index.php" class="goto-page-form" style="display: inline-block; margin-left: 15px;">
+            <label for="goto-page">Đến trang:</label>
+            <input type="number" name="page" id="goto-page" min="1" max="<?php echo $totalPages; ?>" 
+                   placeholder="<?php echo $currentPage; ?>" 
+                   style="width: 60px; padding: 5px; text-align: center; border: 1px solid #ddd; border-radius: 4px;">
+            <button type="submit" style="padding: 5px 10px; background: #cd1818; color: white; border: none; border-radius: 4px; cursor: pointer;">Đi</button>
+            
+            <?php if ($category_id): ?>
+                <input type="hidden" name="category" value="<?php echo htmlspecialchars($category_id); ?>">
+            <?php endif; ?>
+            <?php if ($search): ?>
+                <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
+            <?php endif; ?>
+            <?php if ($brand_id): ?>
+                <input type="hidden" name="brand" value="<?php echo htmlspecialchars($brand_id); ?>">
+            <?php endif; ?>
+        </form>
     </div>
+
+    <script>
+        // Validate input trang
+        document.getElementById('goto-page').addEventListener('input', function() {
+            const max = parseInt(this.max);
+            const min = parseInt(this.min);
+            let value = parseInt(this.value);
+            
+            if (value > max) this.value = max;
+            if (value < min) this.value = min;
+        });
+    </script>
 
 </body>
 </html>

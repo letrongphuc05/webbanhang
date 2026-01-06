@@ -3,7 +3,7 @@ if (isset($_POST['submit'])) {
     // Đảm bảo kết nối CSDL được thiết lập, dùng $connect như trong connect.php
     $servername = "localhost";  
     $username = "root";  
-    $password = ""; 
+    $password = "chotien22"; 
     $database = "webbanhang";  
 
     $connect = mysqli_connect($servername, $username, $password, $database);  

@@ -33,12 +33,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         if (mysqli_stmt_execute($stmt)) {
             $order_id = mysqli_insert_id($connect);
+            
+            // Sửa: Thay đổi cột product_id thành product_code để lưu MASP
             $sql_detail = "INSERT INTO order_details (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
             $stmt_detail = mysqli_prepare($connect, $sql_detail);
+            
             foreach ($_SESSION['cart'] as $product) {
-                mysqli_stmt_bind_param($stmt_detail, "isid", $order_id, $product['id'], $product['quantity'], $product['price']);
+                // Chuyển MASP thành product_id bằng cách extract số từ MASP
+                // Nếu là số thuần (MASP cũ) thì dùng trực tiếp, nếu là TEST... thì lấy 0
+                $product_id_value = is_numeric($product['id']) ? intval($product['id']) : 0;
+                
+                mysqli_stmt_bind_param($stmt_detail, "iiid", $order_id, $product_id_value, $product['quantity'], $product['price']);
                 mysqli_stmt_execute($stmt_detail);
             }
+            
             unset($_SESSION['cart']);
             header("Location: checkout.php?order_id=" . $order_id);
             exit();
