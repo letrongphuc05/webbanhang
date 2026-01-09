@@ -45,8 +45,60 @@ function getPaginationQueryString($page, $category_id, $search, $brand_id) {
     <title>Trang Chủ - LaptopDz</title>
     <link rel="stylesheet" href="./fontawesome-free-6.6.0-web/css/all.min.css">
     <link rel="stylesheet" href="interface.css?v=<?php echo time(); ?>"> 
+    <style>
+        /* Loading Spinner */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #cd1818;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Load Time Display */
+        #load-time {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(205, 24, 24, 0.9);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 10000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+    </style>
 </head>
 <body>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Load Time Display -->
+    <div id="load-time"></div>
 
     <nav>
         <div class="container nav-content">
@@ -206,6 +258,35 @@ function getPaginationQueryString($page, $category_id, $search, $brand_id) {
     </div>
 
     <script>
+        // Bắt đầu đo thời gian load trang
+        const pageLoadStart = Date.now();
+        
+        // Khi trang load xong
+        window.addEventListener('load', function() {
+            const loadTime = ((Date.now() - pageLoadStart) / 1000).toFixed(3);
+            document.getElementById('load-time').innerHTML = 
+                '<i class="fa-solid fa-clock"></i> Tải trang: ' + loadTime + 's';
+            
+            // Ẩn load time sau 5 giây
+            setTimeout(function() {
+                document.getElementById('load-time').style.display = 'none';
+            }, 5000);
+        });
+        
+        // Hiển thị loading khi click vào link
+        document.addEventListener('click', function(e) {
+            const link = e.target.closest('a');
+            if (link && link.href && !link.hasAttribute('download') && 
+                link.target !== '_blank' && !link.href.startsWith('tel:')) {
+                document.getElementById('loading-overlay').style.display = 'flex';
+            }
+        });
+        
+        // Hiển thị loading khi submit form
+        document.addEventListener('submit', function(e) {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        });
+        
         // Validate input trang
         document.getElementById('goto-page').addEventListener('input', function() {
             const max = parseInt(this.max);
