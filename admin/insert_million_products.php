@@ -5,7 +5,6 @@ ini_set('memory_limit', '1024M');
 
 require_once('connect.php');
 
-// Tải dữ liệu hình ảnh từ bảng chuẩn (nếu tồn tại)
 $imageMap = [];
 $tableExists = $conn->query("SHOW TABLES LIKE 'san_pham_that_backup'");
 if ($tableExists && $tableExists->num_rows > 0) {
@@ -22,7 +21,7 @@ if ($tableExists && $tableExists->num_rows > 0) {
     echo "Bảng backup không tồn tại, sử dụng ảnh mặc định.<br>";
 }
 
-// Tải tên Loại và Hãng
+
 $loaiNames = [];
 $resL = $conn->query("SELECT MALOAI, TENLOAI FROM loai_san_pham");
 while($r = $resL->fetch_assoc()) { $loaiNames[$r['MALOAI']] = $r['TENLOAI']; }
@@ -36,7 +35,7 @@ $conn->query("TRUNCATE TABLE san_pham");
 
 echo "Bắt đầu nạp 1.000.000 sản phẩm...<br>";
 
-$batchSize = 2500; 
+$batchSize = 5000; 
 $total = 1000000;
 $startTime = microtime(true);
 

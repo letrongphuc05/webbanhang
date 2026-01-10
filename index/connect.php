@@ -2,7 +2,7 @@
     
     $servername = "localhost";  
     $username = "root";   
-    $password = "chotien22";  
+    $password = "123456";  
     $dbname = "webbanhang";    
     
      
